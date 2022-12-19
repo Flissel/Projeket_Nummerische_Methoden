@@ -16,7 +16,7 @@ function presentation()
     for stragie in 1:length(Domini.NStrategies)
         Domestications.simulate!(Domini,T)
     end    
-    obs_DF= Oberservable(DataFrame())
+   #  obs_DF= Oberservable(DataFrame())
     #TODO reshape Domini.x to arr with pop1 new arr with pop2
 	Plots.do_lines(Domini)	
     #####################
@@ -25,7 +25,7 @@ function presentation()
    # display_results(Test)
 
 end   
-main.presentation()
+Main.presentation()
 
 
     
