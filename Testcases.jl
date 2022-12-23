@@ -28,13 +28,21 @@ Test 1 ALL AllDefect
 function testcase_all_defect()
 	println("\n============ Testcase: All_Defect: ===============")
 	# Define cyclic mutation matrix (column sum = 1):
+	
 	A_PayOff = [4.0 0.0; 5.0 1.0]
+
 	AllDefect = [[0, 0], [0, 0.2], [0.2, 0.2], [0.4, 0.3]]
 	StartPopulation = [1.,1.,1.,1.]
-	StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
 
+	StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
+	println("\n============ chosen MutationMartix ==============")
+	# Define cyclic mutation matrix (column sum = 1):
+	MutationRotationMatrix=[0.25 0.25 0.25 0.25; 0.25 0.25 0.25 0.25; 0.25 0.25 0.25 0.25; 0.25 0.25 0.25 0.25]
+	Println(MutationRotationMatrix)
+	
 	println("\n============ chosen strategies: ===============")
 	println(AllDefect) 
+
 	println("\n============ Intially Population: ===============")
 	println(StartPopulation) 
 
