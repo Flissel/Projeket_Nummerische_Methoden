@@ -6,14 +6,19 @@ Module Mutators: A model of mutation and the quasi-species equation.
 
 Author: Niall Palfreyman, 22/11/2022
 """
+
+
+
+
+
 module Domestications
 
-	export Domesticator,simulate!,addInitialzation
+	export Domesticator,simulate!,add_initialzation
 #-----------------------------------------------------------------------------------------
 # Module types:
 #-----------------------------------------------------------------------------------------
 """
-	Mutator
+	Domesticator
 
 A Mutator represents the time-evolution of a quasi-species model with mutation and selection.
 """
@@ -30,8 +35,8 @@ mutable struct Domesticator
 		
 	"""
 
- 	function Domesticator(A_PayOff::Matrix{Float64}, NStrategies::Vector{Vector{Float64}},NGenerations)
-
+ 	function Domesticator(A_PayOff::Matrix{Float64}, NStrategies::Vector{Vector{Float64}},NGenerations::Int)
+		
 		new(
 			ones(length(NStrategies),length(NStrategies)),
 			A_PayOff,
@@ -49,12 +54,13 @@ end
 #-----------------------------------------------------------------------------------------
 # Module methods:
 #-----------------------------------------------------------------------------------------
-function addInitialzation(Domini::Domesticator,StartPopulation::Vector{Float64})
+function add_initialzation(Domini::Domesticator,StartPopulation::Vector{Float64})
 	Domini.x[1] = deepcopy(StartPopulation)
 	Domini.A_LongTermPayOff = do_nowak(Domini.A_PayOff, Domini.NStrategies)
 end
 
 function simulate!(Domini::Domesticator,T::Real)
+	
 	dt = T/Domini.resolution;		# Full time-step
 	dt2 = dt/2;						# RK2 half time-step
 	

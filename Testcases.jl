@@ -8,13 +8,18 @@ module Testcases
 		ChosenStragies::Vector{Vector{Float64}}
 		StartPopulation::Vector{Float64}
 		NGenerations::Int
+		Mutationrate::Int
 
-		function Testcase(A_PayOff::Matrix{Float64},ChosenStragies::Vector{Vector{Float64}},StartPopulation::Vector{Float64},NGenerations::Int=100)
+		function Testcase(A_PayOff::Matrix{Float64}, ChosenStragies::Vector{Vector{Float64}}, StartPopulation::Vector{Float64})
+			NGenerations = 1000
+			Mutationrate = NGenerations * 0.01
+			
 			new(
 			A_PayOff,
 			ChosenStragies,
 			StartPopulation,
-			NGenerations
+			NGenerations,
+			Mutationrate
 			)
 		end
 		
@@ -27,19 +32,15 @@ Test 1 ALL AllDefect
 
 function testcase_all_defect()
 	println("\n============ Testcase: All_Defect: ===============")
-	# Define cyclic mutation matrix (column sum = 1):
-	
 	A_PayOff = [4.0 0.0; 5.0 1.0]
-
 	AllDefect = [[0, 0], [0, 0.2], [0.2, 0.2], [0.4, 0.3]]
 	StartPopulation = [1.,1.,1.,1.]
-
 	StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
-	println("\n============ chosen MutationMartix ==============")
-	# Define cyclic mutation matrix (column sum = 1):
-	MutationRotationMatrix=[0.25 0.25 0.25 0.25; 0.25 0.25 0.25 0.25; 0.25 0.25 0.25 0.25; 0.25 0.25 0.25 0.25]
-	Println(MutationRotationMatrix)
-	
+
+	println("\n============ chosen Mutaionsrate ==============")
+	Mutationrate = 10
+	println(Mutationrate)
+
 	println("\n============ chosen strategies: ===============")
 	println(AllDefect) 
 
@@ -56,15 +57,11 @@ Test 2 All_Cooperate
 function testcase_all_cooperate()
     
 	println("\n============ Testcase: All_Cooperate: ===============")
-
-	# Define cyclic mutation matrix (column sum = 1):
 	A_PayOff = [4.0 0.0; 5.0 1.0]
 	AllCooperate = [[0, 0], [0, 0.2], [0.2, 0.2], [0.4, 0.3]]
 
 	println("\n============ chosen strategies: ===============")
-	println(AllCooperate) 
-
-									
+	println(AllCooperate) 									
 end 
 
 end

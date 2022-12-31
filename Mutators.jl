@@ -6,89 +6,77 @@ Module Mutators: A model of mutation and the quasi-species equation.
 
 Author: Niall Palfreyman, 22/11/2022
 """
+
 module Mutators
-using GLMakie
+
+	export mutate!
 
 #-----------------------------------------------------------------------------------------
 # Module types:
 #-----------------------------------------------------------------------------------------
 """
-	Mutator
+	QuasiSpeciesModel
 
-A Mutator represents the time-evolution of a quasi-species model with mutation and selection.
+A QuasiSpeciesModel represents the time-evolution of a quasi-species model with mutation and selection.
 """
-struct Mutator
-	Q::Matrix{Real}				# Mutation matrix
-	r::Vector{Real}				# Vector of three type fitnesses
-	resolution::Int				# Resolution of timescale
-	t::Vector{Float64}			# Timescale
-	x::Vector{Vector{Float64}}	# Time-series of three population types
+struct QuasiSpeciesModel
+	mutation_matrix::Matrix{Real}					# Mutation matrix
+	fitness_values::Vector{Real}					# Vector of three type fitnesses
+	time_steps::Int									# Resolution of timescale
+	timescale::Vector{Float64}						# Timescale
+	population_trajectory::Vector{Vector{Float64}}	# Time-series of three population types
 
 	"""
-		Mutator( Q, r)
+		QuasiSpeciesModel( mutation_matrix, fitness_values)
 
-	The one-and-only Mutator constructor: Create a Mutator population stepping from
-	time zero to ngenerations (1000), using fitness values r.
+	The one-and-only QuasiSpeciesModel constructor: Create a QuasiSpeciesModel population stepping from
+	time zero to ngenerations (1000), using fitness values fitness_values.
 	"""
- 	function Mutator( Q::Matrix{Float64}, r::Vector{Float64}=[1.,1.,1.])
-		ngenerations = 1000
+ 	function QuasiSpeciesModel( mutation_matrix::Matrix{Float64}, fitness_values::Vector{Float64})  
+		time_steps = 900
 		new(
-			Q, r/sum(r), ngenerations,
-			zeros(Float64,ngenerations+1),
-			Vector{Vector{Float64}}(undef,ngenerations+1)
+			mutation_matrix, fitness_values/sum(fitness_values), time_steps,
+			zeros(Float64,time_steps+1),
+			Vector{Vector{Float64}}(undef,time_steps+1)
 		)
 	end
 end
-
 #-----------------------------------------------------------------------------------------
 # Module methods:
 #-----------------------------------------------------------------------------------------
 
-"""
-	simulate!( mutator, x0, T)
-
-Simulate the mutator dynamics for T ticks, starting from initial state x0.
-"""
-function simulate!( mut::Mutator, x0::Vector{Float64}, T::Real)
-	dt = T/mut.resolution;			# Full time-step
-	dt2 = dt/2;						# RK2 half time-step
+function simulate!( mut::QuasiSpeciesModel, initial_population::Vector{Float64}, total_time::Real)
+	time_step = total_time / mut.time_steps;			# Full time-step
+	half_time_step = time_step / 2;						# RK2 half time-step
 	
 	# Set up time scale and initial value of population:
-	mut.t[:] = 0:dt:T
-	mut.x[1] = x0 / sum(x0)
+	mut.timescale[:] = 0:time_step:total_time
+	mut.population_trajectory[1] = initial_population / sum(initial_population)
 	
 	# Calculate population trajectory:
-	for step = 1:mut.resolution
+	for step = 1:mut.time_steps
 		# Perform RK2 half-step:
-		x  = mut.x[step]
-		R  = mut.r' * x
-		xh = x + dt2 * (mut.Q * (mut.r .* x) - R * x)
+		current_population  = mut.population_trajectory[step]
+		R  = mut.fitness_values' * current_population
+		half_step_population = current_population + half_time_step * (mut.mutation_matrix * (mut.fitness_values .* current_population) - R * current_population)
 
 		# Perform RK2 full-step:
-		R  = mut.r' * xh
-		mut.x[step+1] = x + dt * (mut.Q * (mut.r .* xh) - R * xh)
+		R  = mut.fitness_values' * half_step_population
+		mut.population_trajectory[step+1] = current_population + time_step * (mut.mutation_matrix * (mut.fitness_values .* half_step_population) - R * half_step_population)
 	end
 end
 
+
 """
-	unittest()
+	mutate!()
 
 Simulate cyclic mutation and selection dynamics of 3 population types.
 """
-function unittest()
-	println("\n============ Unit test Mutators: ===============")
+function mutate!(CurrentPopulation::Vector{Float64},MutationRotationMatrix::Matrix{Float64},FitnessValues::Vector{Float64})
+	mut = QuasiSpeciesModel( MutationRotationMatrix, FitnessValues)
+	simulate!( mut, CurrentPopulation, 1.)
+	sum(mut.population_trajectory)/10 #edit for field
 
-	# Define cyclic mutation matrix (column sum = 1):
-	Q = [
-		0.9 0.0 0.1
-		0.1 0.9 0.0
-		0.0 0.1 0.9
-	]
 
-	mut = Mutator( Q, [1.,2.,3.])
-	simulate!( mut, [10.,2.,1.], 100)
 end
-Mutators.unittest()
-mut = Mutators
-
 end		# ... of module Mutators
