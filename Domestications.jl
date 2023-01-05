@@ -12,8 +12,8 @@ Author: Niall Palfreyman, 22/11/2022
 
 
 module Domestications
-
-	export Domesticator,simulate!,add_initialzation
+	using DelimitedFiles
+	export Domesticator,simulate!,add_initialzation,calculate_longterm_payoff_matrix
 #-----------------------------------------------------------------------------------------
 # Module types:
 #-----------------------------------------------------------------------------------------
@@ -27,7 +27,8 @@ mutable struct Domesticator
 	A_LongTermPayOff::Matrix{Float64}			#
     A_PayOff::Matrix{Float64}					#
     NStrategies::Vector{Vector{Float64}}        #an n Population strategies 
-    resolution::Int
+    Mutationrate::Int
+	resolution::Int
     t::Vector{Float64}
     x::Vector{Vector{Float64}}	                #Time-series of n population types
 
@@ -35,12 +36,14 @@ mutable struct Domesticator
 		
 	"""
 
- 	function Domesticator(A_PayOff::Matrix{Float64}, NStrategies::Vector{Vector{Float64}},NGenerations::Int)
-		
+ 	function Domesticator(A_PayOff::Matrix{Float64}, NStrategies::Vector{Vector{Float64}},Mutationrate::Float64)
+		NGenerations = 1000
+
 		new(
 			ones(length(NStrategies),length(NStrategies)),
 			A_PayOff,
 			NStrategies,
+			Mutationrate,
 			NGenerations,
 			zeros(Float64,NGenerations+1), 
             Vector{Vector{Float64}}(undef, NGenerations+1)
@@ -56,7 +59,7 @@ end
 #-----------------------------------------------------------------------------------------
 function add_initialzation(Domini::Domesticator,StartPopulation::Vector{Float64})
 	Domini.x[1] = deepcopy(StartPopulation)
-	Domini.A_LongTermPayOff = do_nowak(Domini.A_PayOff, Domini.NStrategies)
+	Domini.A_LongTermPayOff = calculate_longterm_payoff_matrix(Domini.A_PayOff, Domini.NStrategies)
 end
 
 function simulate!(Domini::Domesticator,T::Real)
@@ -75,8 +78,13 @@ function simulate!(Domini::Domesticator,T::Real)
 		xh = x + dt2 * x .* (Domini.A_LongTermPayOff * x .- R)
 
 		# Perform RK2 full-step:
-		R  = xh' * Domini.A_LongTermPayOff * xh
+		R  = xh' * Domini.A_LongTermPayOff * xh 
 		Domini.x[step+1] = x + dt * xh .* (Domini.A_LongTermPayOff * xh .- R)
+		
+		if step % Int(Domini.Mutationrate) == 0		
+			mutate_worst_strategie(Domini,step)
+			Domini.A_LongTermPayOff = calculate_longterm_payoff_matrix(Domini.A_PayOff, Domini.NStrategies)
+		end	
 	end
 end
 #nowak
@@ -85,7 +93,7 @@ end
 #     r[i]   ≡ pi - qi
 #     |r[i]*r[j]| < 1
 # end
-function do_nowak(A_PayOff,NStrategies)
+function calculate_longterm_payoff_matrix(A_PayOff,NStrategies)
 	#declartion
 	r = zeros(size(NStrategies, 1))
 	strategieSize = length(NStrategies)
@@ -117,9 +125,39 @@ function do_nowak(A_PayOff,NStrategies)
 			A_LongTermPayOff[i,j] = R*s[i,j]*s[j,i] + S*s[i,j]*(1-s[j,i]) + T*(1-s[i,j])*s[j,i] + P*(1-s[i,j])*(1-s[j,i])	
 		end
 	end
+	writedlm(stdout, A_LongTermPayOff)
 	A_LongTermPayOff
 end
 
+function mutate_worst_strategie(Domini,step) 
+	#find min max of Population
+    bestStrategie= findmax(Domini.x[step])
+    worstStrategie = findmin(Domini.x[step])
+	#save their Stragies 
+    TragetStrategie = deepcopy(Domini.NStrategies[worstStrategie[2]])
+    TemplateStrategie = deepcopy(Domini.NStrategies[bestStrategie[2]])
+	#show in Terminal
+   # println("\nStrategie To Mutate: " , TragetStrategie )
+   # println("Strategie used as Template: " , TemplateStrategie)
+	#calulate some randomes 
+	randval1 = 0.01 * rand( )
+    randval2 = 0.01 * rand( )
+	#new Stragie in area of the TemplateStragie 
+    TragetStrategie[1] = randval1 + TemplateStrategie[1]
+    TragetStrategie[2] = randval2 + TemplateStrategie[2]
+
+	# for hold StragieValues in an Area from 0 - 1 
+   	if TragetStrategie[1] > 1 
+		TragetStrategie[1] = TemplateStrategie[1] - randval1
+   	end    	
+   	if TragetStrategie[2] > 1 
+		TragetStrategie[2] = TemplateStrategie[2] - randval2
+   	end 
+	#println("\nStragie $(Domini.NStrategies[worstStrategie[2]]) mutated to $TragetStrategie at Generation $step")
+	#replace old Stragie with new
+	Domini.NStrategies[worstStrategie[2]][1] = TragetStrategie[1]
+	Domini.NStrategies[worstStrategie[2]][2] = TragetStrategie[2]
+end    
 
 end		# ... of module Domestications
 

@@ -75,8 +75,6 @@ Simulate cyclic mutation and selection dynamics of 3 population types.
 function mutate!(CurrentPopulation::Vector{Float64},MutationRotationMatrix::Matrix{Float64},FitnessValues::Vector{Float64})
 	mut = QuasiSpeciesModel( MutationRotationMatrix, FitnessValues)
 	simulate!( mut, CurrentPopulation, 1.)
-	sum(mut.population_trajectory)/10 #edit for field
-
-
+	sum(mut.population_trajectory)/10     # edit for field
 end
 end		# ... of module Mutators

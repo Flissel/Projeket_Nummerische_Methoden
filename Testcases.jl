@@ -1,4 +1,6 @@
 module Testcases
+	using LinearAlgebra,DelimitedFiles 
+	
 
 	export Testcase, testcase_all_defect
 
@@ -8,11 +10,10 @@ module Testcases
 		ChosenStragies::Vector{Vector{Float64}}
 		StartPopulation::Vector{Float64}
 		NGenerations::Int
-		Mutationrate::Int
+		Mutationrate::Float64
 
-		function Testcase(A_PayOff::Matrix{Float64}, ChosenStragies::Vector{Vector{Float64}}, StartPopulation::Vector{Float64})
-			NGenerations = 1000
-			Mutationrate = NGenerations * 0.01
+		function Testcase(A_PayOff::Matrix{Float64}, ChosenStragies::Vector{Vector{Float64}}, StartPopulation::Vector{Float64},Mutationrate::Int)
+			NGenerations = 10000
 			
 			new(
 			A_PayOff,
@@ -31,23 +32,27 @@ Test 1 ALL AllDefect
 """
 
 function testcase_all_defect()
-	println("\n============ Testcase: All_Defect: ===============")
+	println("\n============ Testcase: All_Defect: ==============")
+	println("\n============ chosen PayOff_Matrix  ==============")
 	A_PayOff = [4.0 0.0; 5.0 1.0]
-	AllDefect = [[0, 0], [0, 0.2], [0.2, 0.2], [0.4, 0.3]]
-	StartPopulation = [1.,1.,1.,1.]
+	writedlm(stdout, A_PayOff)
+	
+	#show(stdout, "text/plain", A_PayOff)
+	AllDefect = [[0.12, 0.0], [0.1, 0.2], [0.2, 0.2], [0.15, 0.1]]
+	StartPopulation = [50.,75.,60.,103.] ## edit here for new startpop
 	StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
 
-	println("\n============ chosen Mutaionsrate ==============")
+	println("\n============ chosen Mutaionsrate   ==============")
 	Mutationrate = 10
-	println(Mutationrate)
+	println("After $Mutationrate generations 1 mutation")
 
-	println("\n============ chosen strategies: ===============")
+	println("\n============ chosen strategies:    ==============")
 	println(AllDefect) 
 
-	println("\n============ Intially Population: ===============")
+	println("\n============ Intially Population:  ==============")
 	println(StartPopulation) 
 
-	Test = Testcase(A_PayOff,AllDefect,StandardisedStartPopulation)
+	Test = Testcase(A_PayOff,AllDefect,StandardisedStartPopulation,Mutationrate)
 	Test
 end
 
