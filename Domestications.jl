@@ -12,7 +12,7 @@ Author: Niall Palfreyman, 22/11/2022
 
 
 module Domestications
-	using DelimitedFiles
+	using DelimitedFiles , Distributions
 	export Domesticator,simulate!,add_initialzation,calculate_longterm_payoff_matrix
 #-----------------------------------------------------------------------------------------
 # Module types:
@@ -36,8 +36,8 @@ mutable struct Domesticator
 		
 	"""
 
- 	function Domesticator(A_PayOff::Matrix{Float64}, NStrategies::Vector{Vector{Float64}},Mutationrate::Float64)
-		NGenerations = 1000
+ 	function Domesticator(A_PayOff::Matrix{Float64}, NStrategies::Vector{Vector{Float64}},Mutationrate::Int,NGenerations::Int )
+		
 
 		new(
 			ones(length(NStrategies),length(NStrategies)),
@@ -125,7 +125,7 @@ function calculate_longterm_payoff_matrix(A_PayOff,NStrategies)
 			A_LongTermPayOff[i,j] = R*s[i,j]*s[j,i] + S*s[i,j]*(1-s[j,i]) + T*(1-s[i,j])*s[j,i] + P*(1-s[i,j])*(1-s[j,i])	
 		end
 	end
-	writedlm(stdout, A_LongTermPayOff)
+	#writedlm(stdout, A_LongTermPayOff)
 	A_LongTermPayOff
 end
 
@@ -134,29 +134,37 @@ function mutate_worst_strategie(Domini,step)
     bestStrategie= findmax(Domini.x[step])
     worstStrategie = findmin(Domini.x[step])
 	#save their Stragies 
-    TragetStrategie = deepcopy(Domini.NStrategies[worstStrategie[2]])
+    TargetStrategie = deepcopy(Domini.NStrategies[worstStrategie[2]])
     TemplateStrategie = deepcopy(Domini.NStrategies[bestStrategie[2]])
 	#show in Terminal
-   # println("\nStrategie To Mutate: " , TragetStrategie )
-   # println("Strategie used as Template: " , TemplateStrategie)
+   # println("\nStrategie To Mutate: " , TargetStrategie )
+  #  println("Strategie used as Template: " , TemplateStrategie)
 	#calulate some randomes 
-	randval1 = 0.01 * rand( )
-    randval2 = 0.01 * rand( )
+	randval1 = 0.2 * rand(Uniform(-1,1)) 
+    randval2 = 0.2 * rand(Uniform(-1,1)) 
 	#new Stragie in area of the TemplateStragie 
-    TragetStrategie[1] = randval1 + TemplateStrategie[1]
-    TragetStrategie[2] = randval2 + TemplateStrategie[2]
+    TargetStrategie[1] = randval1 + TemplateStrategie[1]
+    TargetStrategie[2] = randval2 + TemplateStrategie[2]
 
 	# for hold StragieValues in an Area from 0 - 1 
-   	if TragetStrategie[1] > 1 
-		TragetStrategie[1] = TemplateStrategie[1] - randval1
-   	end    	
-   	if TragetStrategie[2] > 1 
-		TragetStrategie[2] = TemplateStrategie[2] - randval2
+	if TargetStrategie[1] > 1 
+		TargetStrategie[1] = TemplateStrategie[1] - abs(randval1)
+   	end       	
+   	if TargetStrategie[2] > 1 
+		TargetStrategie[2] = TemplateStrategie[2] - abs(randval2)
    	end 
-	#println("\nStragie $(Domini.NStrategies[worstStrategie[2]]) mutated to $TragetStrategie at Generation $step")
+	if TargetStrategie[1] < 0 
+		TargetStrategie[1] = TemplateStrategie[1] +  abs(randval1)
+   	end   
+	if TargetStrategie[2] < 0
+		TargetStrategie[2] = TemplateStrategie[2] + abs(randval1)
+   	end    
+
+	#println("\nStragie $(Domini.NStrategies[worstStrategie[2]]) mutated to $TargetStrategie at Generation $step")
+	
 	#replace old Stragie with new
-	Domini.NStrategies[worstStrategie[2]][1] = TragetStrategie[1]
-	Domini.NStrategies[worstStrategie[2]][2] = TragetStrategie[2]
+	Domini.NStrategies[worstStrategie[2]][1] = TargetStrategie[1]
+	Domini.NStrategies[worstStrategie[2]][2] = TargetStrategie[2]
 end    
 
 end		# ... of module Domestications

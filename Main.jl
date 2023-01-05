@@ -6,31 +6,39 @@ include("Plots.jl")
 const T = 10
 
 function presentation()
-    
-    println("Test 1: ")
-    # erstelle Tastecase 1
-    Test1 = Testcases.testcase_all_defect()
-    # erstelle Dominicator 
-    Domini = Domestications.Domesticator(Test1.A_PayOff,Test1.ChosenStragies,Test1.Mutationrate)
-    # add addInitialzation
-    Domestications.add_initialzation(Domini,Test1.StartPopulation)
-    # simuliere 
-    Domestications.simulate!(Domini,T) # 10 Generationen
-    println("\n Start Population:" , Domini.x[1])
-    println("Last Populationvalues: ", Domini.x[end])
-    println("Chosen Stategies: ", Domini.NStrategies)
-    # speichere Bild nach der ersten Simulation
-    plt1 = Plots.do_lines(Domini)	
-    # TODO mache ein Layout und 
-    
-    println("Test2: ")
-   
-   # display_results(Test)
+    tests = [Testcases.testcase_all_defect(),Testcases.testcase_grimm(),Testcases.testcase_all_cooperate(),Testcases.testcase_tit_for_tat()]
+    i = 1 
+    for test in tests
+        Dominis=[] 
+        for Mutationsrate in test.Mutationrate
+            Domini = Domestications.Domesticator(test.A_PayOff,test.ChosenStragies,Mutationsrate,test.NGenerations)
+            push!(Dominis,Domini)
+        end
+        Plts = []
+        for Domini in Dominis 
+             # add addInitialzation
+            Domestications.add_initialzation(Domini,test.StartPopulation)
+            # simuliere 
+            Domestications.simulate!(Domini,T) 
+            println("\nStart Population:" , Domini.x[1])
+            println("Last Populationvalues: ", Domini.x[end])
+            println("Chosen Stategies: ", Domini.NStrategies)
+            # speichere Bild nach der ersten Simulation
+            fig = Plots.setup_figure(test.Title,Domini.Mutationrate)
+            plt = Plots.fill_figure_with_data(Domini,fig,test.StartStrategies)	
+            push!(Plts,plt)
+            savefig("./Outputs/p"* string(i))
+            
+            if i % 5 == 0 
+                layout=Plots.setup_layout(Plts) 
+                savefig("./Outputs/layout"*string(i))
+                display(layout)
+            end 
+            i += 1 
+        end  
+    end 
 
 end   
-
-   
-   
 Main.presentation()
 
 
