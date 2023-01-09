@@ -2,40 +2,44 @@ include("Testcases.jl")
 include("Domestications.jl")
 include("Plots.jl")
 
-
+using GLMakie:save
 const T = 10
-
+ 
 function presentation()
-    tests = [Testcases.testcase_all_defect(),Testcases.testcase_grimm(),Testcases.testcase_all_cooperate(),Testcases.testcase_tit_for_tat()]
-    i = 1 
-    for test in tests
-        Dominis=[] 
-        for Mutationsrate in test.Mutationrate
-            Domini = Domestications.Domesticator(test.A_PayOff,test.ChosenStragies,Mutationsrate,test.NGenerations)
-            push!(Dominis,Domini)
+    #get all Testcases
+    Tests = [Testcases.testcase_all_defect(),Testcases.testcase_grimm(),
+            Testcases.testcase_all_cooperate(),Testcases.testcase_tit_for_tat()]
+    i = 1 # countervar
+    ALLSimulatedDominisInTest=[] 
+    for Test in Tests
+        #numberOfLayouts=length(Test.Mutationrate)
+        #make for every Mutationrate an SimulationObj
+        for Mutationsrate in Test.Mutationrate
+            Domini = Domestications.Domesticator(Test.A_PayOff,Test.ChosenStragies,Mutationsrate,Test.NGenerations)
+            push!(ALLSimulatedDominisInTest,Domini)
         end
-        Plts = []
-        for Domini in Dominis 
+        for Domini in ALLSimulatedDominisInTest 
              # add addInitialzation
-            Domestications.add_initialzation(Domini,test.StartPopulation)
-            # simuliere 
+            Domestications.add_initialzation(Domini,Test.StartPopulation)
+            # simulate
             Domestications.simulate!(Domini,T) 
-            println("\nStart Population:" , Domini.x[1])
+            # fancy printing
+            println("\nTest: " , Test.Title," with every $(Domini.Mutationrate) Generation one Mutation")
+            println("Start Population:" , Domini.x[1])
             println("Last Populationvalues: ", Domini.x[end])
-            println("Chosen Stategies: ", Domini.NStrategies)
-            # speichere Bild nach der ersten Simulation
-            fig = Plots.setup_figure(test.Title,Domini.Mutationrate)
-            plt = Plots.fill_figure_with_data(Domini,fig,test.StartStrategies)	
-            push!(Plts,plt)
-            savefig("./Outputs/p"* string(i))
-            
-            if i % 5 == 0 
-                layout=Plots.setup_layout(Plts) 
-                savefig("./Outputs/layout"*string(i))
-                display(layout)
-            end 
+            println("Envolved Stategies: ", Domini.NStrategies)
+            # setup Plot 
+            fig,ax = Plots.setup_figure(Test.Title,Domini.Mutationrate,Domini.resolution)
+            # fill with data
+            Plots.fill_figure_with_data(Domini,fig,ax,Test.StartStrategies,i)	
+            # push into a list for Layout
             i += 1 
-        end  
+        end
+        fig = Plots.setup_layout(ALLSimulatedDominisInTest,Test.Title,Test.NGenerations)
+        fig = Plots.fill_layout_with_data(ALLSimulatedDominisInTest,fig,Test.StartStrategies,Test.Title)
+        ALLSimulatedDominisInTest = []
+        display(fig)
+        sleep(40)
     end 
 
 end   

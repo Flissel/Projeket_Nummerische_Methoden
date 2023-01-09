@@ -35,7 +35,9 @@ struct QuasiSpeciesModel
  	function QuasiSpeciesModel( mutation_matrix::Matrix{Float64}, fitness_values::Vector{Float64})  
 		time_steps = 900
 		new(
-			mutation_matrix, fitness_values/sum(fitness_values), time_steps,
+			mutation_matrix,
+			fitness_values/sum(fitness_values),
+			time_steps,
 			zeros(Float64,time_steps+1),
 			Vector{Vector{Float64}}(undef,time_steps+1)
 		)

@@ -100,7 +100,6 @@ function calculate_longterm_payoff_matrix(A_PayOff,NStrategies)
 	s = zeros(strategieSize, strategieSize)
 	A_LongTermPayOff = deepcopy(s)
 	q = Vector{Float64}(undef, strategieSize)
-
 	#give values
 	R = A_PayOff[1, 1]
 	S = A_PayOff[1, 2]
@@ -133,12 +132,12 @@ function mutate_worst_strategie(Domini,step)
 	#find min max of Population
     bestStrategie= findmax(Domini.x[step])
     worstStrategie = findmin(Domini.x[step])
-	#save their Stragies 
+	#save their Strategies 
     TargetStrategie = deepcopy(Domini.NStrategies[worstStrategie[2]])
     TemplateStrategie = deepcopy(Domini.NStrategies[bestStrategie[2]])
 	#show in Terminal
-   # println("\nStrategie To Mutate: " , TargetStrategie )
-  #  println("Strategie used as Template: " , TemplateStrategie)
+   	#println("\nStrategie To Mutate: " , TargetStrategie )
+  	#println("Strategie used as Template: " , TemplateStrategie)
 	#calulate some randomes 
 	randval1 = 0.2 * rand(Uniform(-1,1)) 
     randval2 = 0.2 * rand(Uniform(-1,1)) 
