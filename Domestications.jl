@@ -1,44 +1,42 @@
-#========================================================================================#
 """
-	Mutators
+	Domestications Module 
+		develop Populations Trajectory based on Stragies, Mutaionrate and LongTermPayOff
 
-Module Mutators: A model of mutation and the quasi-species equation.
-
-Author: Niall Palfreyman, 22/11/2022
 """
-
-
-
-
-
 module Domestications
-	using DelimitedFiles , Distributions
-	export Domesticator,simulate!,add_initialzation,calculate_longterm_payoff_matrix
+	#used packages
+	using  Distributions
+	
+	#exported methods
+	export Domesticator,simulate,add_initialzation
 #-----------------------------------------------------------------------------------------
 # Module types:
 #-----------------------------------------------------------------------------------------
 """
-	Domesticator
-
-A Mutator represents the time-evolution of a quasi-species model with mutation and selection.
+Domesticator 
+	A structure representing the state and configuration of a quasi-species model with mutation and selection
 """
 mutable struct Domesticator
 
-	A_LongTermPayOff::Matrix{Float64}			#
-    A_PayOff::Matrix{Float64}					#
+	A_LongTermPayOff::Matrix{Float64}			#LongTermPayOff
+    A_PayOff::Matrix{Float64}					#PayOff
     NStrategies::Vector{Vector{Float64}}        #an n Population strategies 
-    Mutationrate::Int
-	resolution::Int
-    t::Vector{Float64}
+    Mutationrate::Int							#Mutationduration
+	resolution::Int								#res
+    t::Vector{Float64}							#Time-Series 
     x::Vector{Vector{Float64}}	                #Time-series of n population types
-
+	
 	"""
+	Domesticator(A_PayOff::Matrix{Float64}, NStrategies::Vector{Vector{Float64}}, Mutationrate::Int, NGenerations::Int )
+		Constructor function for the Domesticator struct
 		
+		Parameters:
+		- A_PayOff (Matrix{Float64}): The payoff matrix
+		- NStrategies (Vector{Vector{Float64}}): An n-dimensional vector of strategies
+		- Mutationrate (Int): The mutation rate of the model
+		- NGenerations (Int): The number of generations to simulate
 	"""
-
- 	function Domesticator(A_PayOff::Matrix{Float64}, NStrategies::Vector{Vector{Float64}},Mutationrate::Int,NGenerations::Int )
-		
-
+ 	function Domesticator(A_PayOff::Matrix{Float64}, NStrategies::Vector{Vector{Float64}}, Mutationrate::Int, NGenerations::Int )
 		new(
 			ones(length(NStrategies),length(NStrategies)),
 			A_PayOff,
@@ -47,22 +45,36 @@ mutable struct Domesticator
 			NGenerations,
 			zeros(Float64,NGenerations+1), 
             Vector{Vector{Float64}}(undef, NGenerations+1)
-
 		)
     end
 end
-
-
-
 #-----------------------------------------------------------------------------------------
 # Module methods:
 #-----------------------------------------------------------------------------------------
-function add_initialzation(Domini::Domesticator,StartPopulation::Vector{Float64})
+"""
+	Sets the initial state of the Domesticator struct
+
+	Parameters:
+	- Domini (Domesticator): The Domesticator struct
+	- StartPopulation (Vector{Float64}): Initial population of each strategy
+	- Strategies (Vector{Vector{Float64}}): A vector of strategies
+	"""
+function add_initialzation(Domini::Domesticator,StartPopulation::Vector{Float64},Stragies::Vector{Vector{Float64}})
 	Domini.x[1] = deepcopy(StartPopulation)
 	Domini.A_LongTermPayOff = calculate_longterm_payoff_matrix(Domini.A_PayOff, Domini.NStrategies)
+	Domini.NStrategies = deepcopy(Stragies)
 end
+#-----------------------------------------------------------------------------------------
+"""
+function simulate(Domini::Domesticator,T::Real)
 
-function simulate!(Domini::Domesticator,T::Real)
+	Simulate the population over a specified number of generations
+
+	Parameters:
+	- Domini (Domesticator): The state and configuration of the quasi-species model
+	- T (Real): The number of generations to simulate
+"""
+function simulate(Domini::Domesticator,T::Real)
 	
 	dt = T/Domini.resolution;		# Full time-step
 	dt2 = dt/2;						# RK2 half time-step
@@ -82,18 +94,31 @@ function simulate!(Domini::Domesticator,T::Real)
 		Domini.x[step+1] = x + dt * xh .* (Domini.A_LongTermPayOff * xh .- R)
 		
 		if step % Int(Domini.Mutationrate) == 0		
-			mutate_worst_strategie(Domini,step)
+			rotation_mutation(Domini,step)
 			Domini.A_LongTermPayOff = calculate_longterm_payoff_matrix(Domini.A_PayOff, Domini.NStrategies)
 		end	
 	end
 end
-#nowak
-#     A[i,j] ≡ R*s[i,j].*s[j,i] + S*s[i,j].*(1-s[j,i]) + T*(1-s[i,j]).*s[j,i] + P*(1-s[i,j])(1-s[j,i]) bestimmte kombination aus s, zeigt die transformation von population 
-#     s[i,j] ≡ (r[i]*qj + qi)/(1 - r[i]*r[j]) matrix von werten, berechnet aus strategien
-#     r[i]   ≡ pi - qi
-#     |r[i]*r[j]| < 1
-# end
+#-----------------------------------------------------------------------------------------
+
+"""
 function calculate_longterm_payoff_matrix(A_PayOff,NStrategies)
+
+	Calculates the long-term payoff matrix for a given payoff matrix and set of strategies
+	    Based on:
+	    A[i,j] ≡ R*s[i,j].*s[j,i] + S*s[i,j].*(1-s[j,i]) + T*(1-s[i,j]).*s[j,i] + P*(1-s[i,j])(1-s[j,i])  
+	    s[i,j] ≡ (r[i]*qj + qi)/(1 - r[i]*r[j])
+	    r[i]   ≡ pi - qi
+	    |r[i]*r[j]| < 1
+
+	Parameters:
+	- A_PayOff (Matrix{Float64}): The payoff matrix
+	- NStrategies (Vector{Vector{Float64}}): An n-dimensional vector of strategies
+
+	Returns:
+	- A_LongTermPayOff (Matrix{Float64}): The calculated long-term payoff matrix
+"""
+function calculate_longterm_payoff_matrix(A_PayOff::Matrix{Float64},NStrategies::Vector{Vector{Float64}})
 	#declartion
 	r = zeros(size(NStrategies, 1))
 	strategieSize = length(NStrategies)
@@ -105,12 +130,12 @@ function calculate_longterm_payoff_matrix(A_PayOff,NStrategies)
 	S = A_PayOff[1, 2]
 	T = A_PayOff[2, 1]
 	P = A_PayOff[2, 2]
-	#
+	#Calculate r
 	for k in 1:strategieSize
 		tmp = NStrategies[k][:]
 		r[k] = tmp[1] - tmp[2]
 	end
-	#
+	# Calculate Values for Matrix
 	for i in 1:strategieSize
 		for j in 1:strategieSize
 			q[j] = NStrategies[j][2]
@@ -118,54 +143,89 @@ function calculate_longterm_payoff_matrix(A_PayOff,NStrategies)
 			s[i,j] = (r[i] * q[j] + q[i])/(1 - r[i]*r[j])
 		end
 	end
-
+	# set it
 	for i in 1:strategieSize
 		for j in 1:strategieSize
 			A_LongTermPayOff[i,j] = R*s[i,j]*s[j,i] + S*s[i,j]*(1-s[j,i]) + T*(1-s[i,j])*s[j,i] + P*(1-s[i,j])*(1-s[j,i])	
 		end
 	end
-	#writedlm(stdout, A_LongTermPayOff)
 	A_LongTermPayOff
 end
-
-function mutate_worst_strategie(Domini,step) 
-	#find min max of Population
-    bestStrategie= findmax(Domini.x[step])
-    worstStrategie = findmin(Domini.x[step])
-	#save their Strategies 
-    TargetStrategie = deepcopy(Domini.NStrategies[worstStrategie[2]])
-    TemplateStrategie = deepcopy(Domini.NStrategies[bestStrategie[2]])
-	#show in Terminal
-   	#println("\nStrategie To Mutate: " , TargetStrategie )
-  	#println("Strategie used as Template: " , TemplateStrategie)
-	#calulate some randomes 
-	randval1 = 0.2 * rand(Uniform(-1,1)) 
-    randval2 = 0.2 * rand(Uniform(-1,1)) 
-	#new Stragie in area of the TemplateStragie 
-    TargetStrategie[1] = randval1 + TemplateStrategie[1]
-    TargetStrategie[2] = randval2 + TemplateStrategie[2]
-
-	# for hold StragieValues in an Area from 0 - 1 
-	if TargetStrategie[1] > 1 
-		TargetStrategie[1] = TemplateStrategie[1] - abs(randval1)
-   	end       	
-   	if TargetStrategie[2] > 1 
-		TargetStrategie[2] = TemplateStrategie[2] - abs(randval2)
-   	end 
-	if TargetStrategie[1] < 0 
-		TargetStrategie[1] = TemplateStrategie[1] +  abs(randval1)
-   	end   
-	if TargetStrategie[2] < 0
-		TargetStrategie[2] = TemplateStrategie[2] + abs(randval1)
-   	end    
-
-	#println("\nStragie $(Domini.NStrategies[worstStrategie[2]]) mutated to $TargetStrategie at Generation $step")
+#-----------------------------------------------------------------------------------------
+"""
+function rotation_mutation(Domini::Domesticator, step::Int) 
 	
-	#replace old Stragie with new
-	Domini.NStrategies[worstStrategie[2]][1] = TargetStrategie[1]
-	Domini.NStrategies[worstStrategie[2]][2] = TargetStrategie[2]
-end    
+	is a mutation function used to update a strategy in a population of strategies in a Quasi-Species model.
 
-end		# ... of module Domestications
+	The function takes in two arguments:
+	
+	Domini (Domesticator): A Domesticator struct representing the state and configuration of a Quasi-species model
+	step (Int): Current generation step.
+	The function is responsible for updating the strategy of the worst performing strategy in the population, by taking a template strategy from the best performing strategies in the population. The template strategy is then slightly altered by adding random values within a certain range. Finally, these new values are clamped to a certain range to ensure that the strategy remains valid.
+	
+	This function modifies the Domini struct passed in by replacing the strategy of the worst performing strategy with the new mutated strategy.
+
+"""
+function rotation_mutation(Domini::Domesticator, step::Int)
+	worstStrategy = findmin(Domini.x[step])
+	templateStrategy=select_template_strategie(Domini,step)
+	# random max min vals based on the TemplateStrategie
+    minVal = abs(minimum(templateStrategy) + rand(Uniform(-0.2,0.2)))
+    maxVal = abs(maximum(templateStrategy) + rand(Uniform(-0.2,0.2)))
+
+	# random vals for Distribution of Template
+    randValq =  rand(Uniform(- 0.2, 0.2))
+    randValp =  rand(Uniform(- 0.2, 0.2))
+    templateStrategy[1] = randValq + templateStrategy[1]
+    templateStrategy[2] = randValp + templateStrategy[2]
+
+	#To hold the Stragie in range of 0-1 
+	if maxVal > 0.999 
+		maxVal = abs(0.1 * rand(Uniform(-1,1)))
+	end	
+    templateStrategy[1] = clamp(templateStrategy[1],minVal,maxVal)
+    templateStrategy[2] = clamp(templateStrategy[2],minVal,maxVal)
+
+	#replace 
+    Domini.NStrategies[worstStrategy[2]][1] = templateStrategy[1]
+    Domini.NStrategies[worstStrategy[2]][2] = templateStrategy[2]
+end
+#-----------------------------------------------------------------------------------------
+"""
+function select_template_strategie(Domini::Domesticator, step::Int)
+
+	Selects a template strategy from the set of strategies in the Domesticator struct.
+
+	Parameters:
+	- Domini (Domesticator): The Domesticator struct containing the set of strategies
+	- step (Int): The current step/generation in the simulation
+
+	Returns:
+	- templateStrategy (Vector{Float64}): A copy of the selected template strategy
+"""
+function select_template_strategie(Domini::Domesticator, step::Int)
+	#best worst target 
+	bestStrategy = findmax(Domini.x[step])
+
+    # get the number of strategies
+    numStrategies = length(Domini.NStrategies)
+
+    # Define the probability of selecting the best strategy
+    probBest = 0.7 # 70% chance of selecting the best strategy
+    probOther = (1 - probBest) / (numStrategies - 1)
+
+    # Create the probability array
+    probArray = fill(probOther, numStrategies)
+    probArray[bestStrategy[2]] = probBest
+
+    # Generate a random number between 1 and the total number of strategies 
+    selectedTemplate = rand(Categorical(probArray))
+
+    #Select the template strategy based on the random number
+    templateStrategy = deepcopy(Domini.NStrategies[selectedTemplate])
+	templateStrategy
+end	
+#-----------------------------------------------------------------------------------------
+end# ... of module Domestications
 
  
