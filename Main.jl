@@ -1,4 +1,4 @@
-include("Requirements.jl") # just run me ones. 
+#include("Requirements.jl") # just run me ones. 
 include("Testcases.jl")
 include("Domestications.jl")
 include("Plots.jl")
@@ -18,7 +18,7 @@ function presentation()
              Testcases.testcase_all_cooperate(),Testcases.testcase_grimm(),
              Testcases.testcase_extrem_mixed_up(),Testcases.testcase_random(),
              Testcases.testcase_mixed_up()]
-
+    #ObjContainer
     ALLSimulatedDominisInTest=[] 
     for Test in Tests
         #make for every Mutationrate an SimulationObj
@@ -33,12 +33,7 @@ function presentation()
             # simulate
             Domestications.simulate(Domini,Test.T) 
             # fancy printing
-            println("\nTest:                " , Test.Title," with every $(Domini.Mutationrate) Steps 1 Mutation")
-            println("Start Population:      " , Domini.x[1])
-            println("Last Populationvalues: " , map((x) -> round(x, digits = 4), Domini.x[end]))
-            println("Start Stategies        " ,Test.ChosenStragies)
-            println("Developed Stategies:   " , map((x) -> round(x, digits = 4), Domini.NStrategies[1]),map((x) -> round(x, digits = 4), Domini.NStrategies[2])
-                                              , map((x) -> round(x, digits = 4), Domini.NStrategies[3]),map((x) -> round(x, digits = 4), Domini.NStrategies[4]))
+            Main.fancy_printing(Test,Domini)
             # setup Figure 
             fig,ax = Plots.setup_figure(Test.Title,Domini.Mutationrate,Domini.resolution)
             # fill with data
@@ -50,10 +45,24 @@ function presentation()
         fig = Plots.fill_layout_with_data(ALLSimulatedDominisInTest,fig,Test.StartStrategies,Test.Title)
         ALLSimulatedDominisInTest = [] 
         display(fig)
-        sleep(10)
+        sleep(30)
     end 
+   
 end   
+"""
+    function fancy_printing(Test,Domini)
+        does the Out in Terminal 
+            based on given 
+            - Test 
+            - Mutationrate
+"""
+function fancy_printing(Test, Domini)
+    println("\nTest:                " , Test.Title," with every $(Domini.Mutationrate) Steps 1 Mutation")
+    println("Start Population:      " , Domini.x[1])
+    println("Last Populationvalues: " , map((x) -> round(x, digits = 4), Domini.x[end]))
+    println("Start Stategies        " ,Test.ChosenStragies)
+    println("Developed Stategies:   " , map((x) -> round(x, digits = 4), Domini.NStrategies[1]),map((x) -> round(x, digits = 4), Domini.NStrategies[2])
+                                      , map((x) -> round(x, digits = 4), Domini.NStrategies[3]),map((x) -> round(x, digits = 4), Domini.NStrategies[4]))
+end
 Main.presentation()
-
-
     

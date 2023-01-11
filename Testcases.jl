@@ -56,22 +56,7 @@ include("PlayGround.jl")
 	#-----------------------------------------------------------------------------------------
 	# Module methods:
 	#-----------------------------------------------------------------------------------------
-	"""
-	Test 2 Tit-For-Tat
-	"""
-	function testcase_tit_for_tat()
-	    Title ="Tit_For_Tat"
-		A_PayOff = A_PAYOFF
-		Stragies = [[0.9, 0.01], [0.9, 0.002], [0.8, 0.001], [0.85, 0.2]]
-		StartStragies = deepcopy(Stragies)
-		StartPopulation = STARTPOPULATION 
-		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
-		Mutationrate = deepcopy(MUTATIONRATE)
-		Test = Testcase(Title,A_PayOff,Stragies,StandardisedStartPopulation,Mutationrate,StartStragies)
-		Test								
-	end 
-	#-----------------------------------------------------------------------------------------
-	"""
+    """
 	Test AllDefect
 	"""
 	function testcase_all_defect()
@@ -82,15 +67,32 @@ include("PlayGround.jl")
 		#define Mutaionsrate
 		Mutationrate = deepcopy(MUTATIONRATE)
 		#define Stragies
-		Strategies = [[0.01, 0.03], [0.12, 0.2], [0.5, 0.3], [0.15, 0.1]]
+		Strategies = STRAGIES_ALL_DEFECT
 		#copy for later
 		StartStrategies = deepcopy(Strategies)
 		#define stardised Startpopulation
 		StartPopulation = STARTPOPULATION 
 		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
+		#define TestOjk
 		Test = Testcase(Title,A_PayOff,Strategies,StandardisedStartPopulation,Mutationrate,StartStrategies)
-		Test
+		Test #return
 	end
+	"""
+	Test Tit-For-Tat
+	"""
+	function testcase_tit_for_tat()
+	    Title ="Tit_For_Tat"
+		A_PayOff = A_PAYOFF
+		Stragies = STRAGIES_TIT_FOR_TAT
+		StartStragies = deepcopy(Stragies)
+		StartPopulation = STARTPOPULATION 
+		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
+		Mutationrate = deepcopy(MUTATIONRATE)
+		Test = Testcase(Title,A_PayOff,Stragies,StandardisedStartPopulation,Mutationrate,StartStragies)
+		Test								
+	end 
+	#-----------------------------------------------------------------------------------------
+
 	#-----------------------------------------------------------------------------------------
 	"""
 	Test All_Cooperate
@@ -98,7 +100,7 @@ include("PlayGround.jl")
 	function testcase_all_cooperate()
 	    Title ="All_Cooperate"
 		A_PayOff = A_PAYOFF
-		Strategies = [[0.9, 0.92], [0.9, 0.8], [0.8, 0.9], [0.85, 0.95]]
+		Strategies = STRAGIES_ALL_COOPERATE
 		StartStrategies = deepcopy(Strategies)
 		StartPopulation = STARTPOPULATION 
 		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
@@ -113,9 +115,9 @@ include("PlayGround.jl")
 	function testcase_grimm()
 	    Title ="Grimm"
 		A_PayOff = A_PAYOFF
-		Strategies = [[0.4, 0.01], [0.5, 0.01], [0.5, 0.01], [0.45, 0.001]]
+		Strategies = STRAGIES_GRIMM
 		StartStrategies = deepcopy(Strategies)
-		StartPopulation = STARTPOPULATION ## edit here for new startpop
+		StartPopulation = STARTPOPULATION 
 		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
 		Mutationrate = deepcopy(MUTATIONRATE)
 		Test = Testcase(Title,A_PayOff,Strategies,StandardisedStartPopulation,Mutationrate,StartStrategies)
@@ -128,9 +130,9 @@ include("PlayGround.jl")
 	function testcase_extrem_mixed_up()
 	    Title ="Extrem_Mixed_up"
 		A_PayOff = A_PAYOFF
-		Strategies = [[0.01, 0.01], [0.99, 0.01], [0.01, 0.99], [0.99, 0.01]]
+		Strategies = STRAGIES_EXTREM_MIX_UP
 		StartStrategies = deepcopy(Strategies)
-		StartPopulation = STARTPOPULATION ## edit here for new startpop
+		StartPopulation = STARTPOPULATION 
 		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
 		Mutationrate = deepcopy(MUTATIONRATE)
 		Test = Testcase(Title,A_PayOff,Strategies,StandardisedStartPopulation,Mutationrate,StartStrategies)
@@ -143,10 +145,7 @@ include("PlayGround.jl")
 	function testcase_random()
 	    Title = "Random"
 		A_PayOff = A_PAYOFF
-		Strategies = [[rand(0.2:0.2:0.8), rand(0.2:0.2:0.8)],
-		    		 [rand(0.2:0.2:0.8), rand(0.2:0.2:0.8)], 
-					 [rand(0.2:0.2:0.8), rand(0.2:0.2:0.8)], 
-					 [rand(0.2:0.2:0.8), rand(0.2:0.2:0.8)]]
+		Strategies = STRAGIES_RANDOM
 		StartStrategies = deepcopy(Strategies)
 		StartPopulation = STARTPOPULATION
 		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
@@ -161,9 +160,9 @@ include("PlayGround.jl")
 	function testcase_mixed_up()
 	    Title ="Mixed_up"
 		A_PayOff = A_PAYOFF
-		Strategies = [[0.31, 0.31], [0.66, 0.31], [0.61, 0.69], [0.69, 0.31]]
+		Strategies = STRAGIES_MIX_UP
 		StartStrategies = deepcopy(Strategies)
-		StartPopulation = STARTPOPULATION ## edit here for new startpop
+		StartPopulation = STARTPOPULATION 
 		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
 		Mutationrate = deepcopy(MUTATIONRATE)
 		Test = Testcase(Title,A_PayOff,Strategies,StandardisedStartPopulation,Mutationrate,StartStrategies)

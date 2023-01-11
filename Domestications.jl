@@ -93,7 +93,7 @@ function simulate(Domini::Domesticator,T::Real)
 		R  = xh' * Domini.A_LongTermPayOff * xh 
 		Domini.x[step+1] = x + dt * xh .* (Domini.A_LongTermPayOff * xh .- R)
 		
-		if step % Int(Domini.Mutationrate) == 0		
+		if step % Int(Domini.Mutationrate) == 1		
 			rotation_mutation(Domini,step)
 			Domini.A_LongTermPayOff = calculate_longterm_payoff_matrix(Domini.A_PayOff, Domini.NStrategies)
 		end	

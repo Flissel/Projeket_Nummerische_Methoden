@@ -17,8 +17,8 @@ using GLMakie
     """
     function setup_figure(Title::String, Mutationrate::Int, xlims)
         fig = Figure()
-        ax = Axis(fig[1, 1], xlabel = "NGenerations", ylabel = "Population Trajectory",
-            title = Title ,subtitle ="One mutation after $Mutationrate Steps",limits = (0, xlims, 0, 1))
+        ax = Axis(fig[1, 1], xlabel = "Time Steps", ylabel = "Population Trajectory",
+            title = Title ,subtitle ="One mutation after $Mutationrate Time Steps",limits = (0, xlims, 0, 1))
         fig,ax
     end
     #-----------------------------------------------------------------------------------------
@@ -80,8 +80,8 @@ using GLMakie
         axes = []
         i=1
         for Domini in ALLSimulatedDominis
-            ax = Axis(positions[i]  ,xlabel = "NGenerations", ylabel = "Population Trajectory",
-                      title = title ,subtitle ="One mutation after $(Domini.Mutationrate) Steps",
+            ax = Axis(positions[i]  ,xlabel = "Time Steps", ylabel = "Population Trajectory",
+                      title = title ,subtitle ="One mutation after $(Domini.Mutationrate) Time Steps",
                       limits = (0, xlims, 0, 1))
             push!(axes,ax)
             i+=1        
