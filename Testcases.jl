@@ -10,12 +10,12 @@ include("PlayGround.jl")
 	#-----------------------------------------------------------------------------------------	
 	"""
     A structure representing the testcase configuration 
-    of a quasi-species model with mutation and selection.
+    of a Dominicator Model with Mutation and Selection.
 	"""
 	struct Testcase 
 		Title::String
 		A_PayOff::Matrix{Float64}
-		ChosenStragies::Vector{Vector{Float64}}
+		ChosenStrategies::Vector{Vector{Float64}}
 		StartPopulation::Vector{Float64}
 		NGenerations::Int
 		Mutationrate::Vector{Int}
@@ -32,18 +32,18 @@ include("PlayGround.jl")
 			- ChosenStragies (Vector{Vector{Float64}}): A vector of chosen strategies
 			- StartPopulation (Vector{Float64}): The starting population of the testcase
 			- Mutationrate (Vector{Int}): The mutation rate of the testcase
-			- StartStrategies (Vector{Vector{Float64}}): A vector of starting strategies
+			- StartStrategies (Vector{Vector{Float64}}): A vector of starting strategies (just for prints)
 			- T (Int): The total time for the testcase
 		"""
 		function Testcase(	Title::String,A_PayOff::Matrix{Float64},
-			 				ChosenStragies::Vector{Vector{Float64}}, StartPopulation::Vector{Float64},
+			 				ChosenStrategies::Vector{Vector{Float64}}, StartPopulation::Vector{Float64},
 			 				Mutationrate::Vector{Int},StartStrategies::Vector{Vector{Float64}})
 			T 
 			NGenerations = NGENERATIONS
 			new(
 			Title,	
 			A_PayOff,
-			ChosenStragies,
+			ChosenStrategies,
 			StartPopulation,
 			NGenerations,
 			Mutationrate,
@@ -67,7 +67,7 @@ include("PlayGround.jl")
 		#define Mutaionsrate
 		Mutationrate = deepcopy(MUTATIONRATE)
 		#define Stragies
-		Strategies = STRAGIES_ALL_DEFECT
+		Strategies = STRATEGIES_ALL_DEFECT
 		#copy for later
 		StartStrategies = deepcopy(Strategies)
 		#define stardised Startpopulation
@@ -83,7 +83,7 @@ include("PlayGround.jl")
 	function testcase_tit_for_tat()
 	    Title ="Tit_For_Tat"
 		A_PayOff = A_PAYOFF
-		Stragies = STRAGIES_TIT_FOR_TAT
+		Stragies = STRATEGIES_TIT_FOR_TAT
 		StartStragies = deepcopy(Stragies)
 		StartPopulation = STARTPOPULATION 
 		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
@@ -100,7 +100,7 @@ include("PlayGround.jl")
 	function testcase_all_cooperate()
 	    Title ="All_Cooperate"
 		A_PayOff = A_PAYOFF
-		Strategies = STRAGIES_ALL_COOPERATE
+		Strategies = STRATEGIES_ALL_COOPERATE
 		StartStrategies = deepcopy(Strategies)
 		StartPopulation = STARTPOPULATION 
 		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
@@ -115,7 +115,7 @@ include("PlayGround.jl")
 	function testcase_grimm()
 	    Title ="Grimm"
 		A_PayOff = A_PAYOFF
-		Strategies = STRAGIES_GRIMM
+		Strategies = STRATEGIES_GRIMM
 		StartStrategies = deepcopy(Strategies)
 		StartPopulation = STARTPOPULATION 
 		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
@@ -130,7 +130,7 @@ include("PlayGround.jl")
 	function testcase_extrem_mixed_up()
 	    Title ="Extrem_Mixed_up"
 		A_PayOff = A_PAYOFF
-		Strategies = STRAGIES_EXTREM_MIX_UP
+		Strategies = STRATEGIES_EXTREM_MIX_UP
 		StartStrategies = deepcopy(Strategies)
 		StartPopulation = STARTPOPULATION 
 		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
@@ -145,7 +145,7 @@ include("PlayGround.jl")
 	function testcase_random()
 	    Title = "Random"
 		A_PayOff = A_PAYOFF
-		Strategies = STRAGIES_RANDOM
+		Strategies = STRATEGIES_RANDOM
 		StartStrategies = deepcopy(Strategies)
 		StartPopulation = STARTPOPULATION
 		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
@@ -160,7 +160,7 @@ include("PlayGround.jl")
 	function testcase_mixed_up()
 	    Title ="Mixed_up"
 		A_PayOff = A_PAYOFF
-		Strategies = STRAGIES_MIX_UP
+		Strategies = STRATEGIES_MIX_UP
 		StartStrategies = deepcopy(Strategies)
 		StartPopulation = STARTPOPULATION 
 		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
@@ -168,4 +168,50 @@ include("PlayGround.jl")
 		Test = Testcase(Title,A_PayOff,Strategies,StandardisedStartPopulation,Mutationrate,StartStrategies)
 		Test								
 	end 
-end
+	#-----------------------------------------------------------------------------------------
+	"""
+	Test Coex
+	"""
+	function testcase_coex()
+	    Title ="Coex"
+		A_PayOff = A_PAYOFF
+		Strategies = STRATEGIES_COEX
+		StartStrategies = deepcopy(Strategies)
+		StartPopulation = STARTPOPULATION 
+		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
+		Mutationrate = deepcopy(MUTATIONRATE)
+		Test = Testcase(Title,A_PayOff,Strategies,StandardisedStartPopulation,Mutationrate,StartStrategies)
+		Test								
+	end 
+	#-----------------------------------------------------------------------------------------
+	"""
+	Test TFT_VS_ADF
+	"""
+	function testcase_tft_vs_adf()
+	    Title ="TFT_VS_ADF"
+		A_PayOff = A_PAYOFF
+		Strategies = STRATEGIES_TFT_VS_DF
+		StartStrategies = deepcopy(Strategies)
+		StartPopulation = STARTPOPULATION 
+		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
+		Mutationrate = deepcopy(MUTATIONRATE)
+		Test = Testcase(Title,A_PayOff,Strategies,StandardisedStartPopulation,Mutationrate,StartStrategies)
+		Test								
+	end 
+	#-----------------------------------------------------------------------------------------
+	"""
+	Test TFT_VS_AC
+	"""
+	function testcase_tft_vs_ac()
+	    Title ="TFT_VS_AC"
+		A_PayOff = A_PAYOFF
+		Strategies = STRATEGIES_TFT_VS_AC
+		StartStrategies = deepcopy(Strategies)
+		StartPopulation = STARTPOPULATION 
+		StandardisedStartPopulation = StartPopulation / sum(StartPopulation)
+		Mutationrate = deepcopy(MUTATIONRATE)
+		Test = Testcase(Title,A_PayOff,Strategies,StandardisedStartPopulation,Mutationrate,StartStrategies)
+		Test								
+	end
+	
+end #of Testcases
