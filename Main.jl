@@ -61,7 +61,7 @@ function presentation()
     end 
    
 end   
-  
+#----------------------------------------------------------------------------------------- 
 """
     function fancy_printing(Test,Domini)
         does the Out in Terminal 
@@ -79,7 +79,7 @@ function fancy_printing(Test, Domini)
                                         map((x) -> round(x, digits = 4), Domini.NStrategies[3]),
                                         map((x) -> round(x, digits = 4), Domini.NStrategies[4]))
 end
-
+#-----------------------------------------------------------------------------------------
 """
     function add_results_to_terminal(title)
         This function prints the results of the specified title to the terminal.
@@ -104,6 +104,7 @@ end
         end
         
     end
+#-----------------------------------------------------------------------------------------
 """
     function printing_introduction()
         This function prints the introduction to the terminal.

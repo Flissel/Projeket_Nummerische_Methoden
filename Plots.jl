@@ -4,7 +4,7 @@ module Plots
     for setup Figures,Layouts
 """
 module Plots
-
+#used packages
 using GLMakie
  
     #exported methods
@@ -102,6 +102,7 @@ using GLMakie
         axes = Plots.setup_axes(ALLSimulatedDominis,title,xlims,positions)
         fig
     end
+    #-----------------------------------------------------------------------------------------
     """
     function setup_axes(ALLSimulatedDominis,title,xlims,positions)
     

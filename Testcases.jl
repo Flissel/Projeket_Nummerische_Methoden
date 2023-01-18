@@ -77,6 +77,7 @@ include("PlayGround.jl")
 		Test = Testcase(Title,A_PayOff,Strategies,StandardisedStartPopulation,Mutationrate,StartStrategies)
 		Test #return
 	end
+	#-----------------------------------------------------------------------------------------
 	"""
 	Test Tit-For-Tat
 	"""
@@ -91,8 +92,6 @@ include("PlayGround.jl")
 		Test = Testcase(Title,A_PayOff,Stragies,StandardisedStartPopulation,Mutationrate,StartStragies)
 		Test								
 	end 
-	#-----------------------------------------------------------------------------------------
-
 	#-----------------------------------------------------------------------------------------
 	"""
 	Test All_Cooperate
