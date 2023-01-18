@@ -15,6 +15,7 @@ include("Playground.jl")
          - the layouts will be displayed for some seconds on Screen  
 """
 function presentation()
+    Main.printing_introduction()
     #get all Testcases
     Tests = [
              Testcases.testcase_tit_for_tat(),
@@ -102,6 +103,20 @@ end
             println(results[title]) 
         end
         
+    end
+"""
+    function printing_introduction()
+        This function prints the introduction to the terminal.
+      
+"""
+    function printing_introduction()
+        println()
+        println("Reseach question: \n$RESEARCH_QUESTION")
+        println()
+        println("Explanation: \n$EXPLANATION")
+        println()
+        println("What you have to take care for: \n$WHATTODO")
+        sleep(45)
     end
 
 Main.presentation()
