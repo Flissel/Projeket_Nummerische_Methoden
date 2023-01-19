@@ -14,7 +14,7 @@ STRATEGIES_TFT_VS_DF =  [[0.021, 0.021], [0.99, 0.01], [0.01, 0.01], [0.02, 0.01
 STRATEGIES_TFT_VS_AC =  [[0.99, 0.021], [0.99, 0.99], [0.91, 0.91], [0.02, 0.99]]
 STRATEGIES_COEX =  [[0.01, 0.01], [0.99, 0.01], [0.99, 0.99], [0.5, 0.01]]
 
-STRATEGIES_EXTREM_MIX_UP = [[0.01, 0.01], [0.99, 0.01], [0.01, 0.99], [0.99, 0.09]]
+STRATEGIES_EXTREM_MIX_UP = [[0.01, 0.01], [0.99, 0.01], [0.01, 0.99], [0.99, 0.99]]
 STRATEGIES_TIT_FOR_TAT = [[0.9, 0.01], [0.9, 0.002], [0.8, 0.001], [0.85, 0.01]]
 STRATEGIES_GRIMM = [[0.4, 0.01], [0.5, 0.01], [0.5, 0.01], [0.45, 0.001]]
 
@@ -47,9 +47,9 @@ Additional in the folder Outputs there will be every diagramm as singel or as la
 RES_ALL_DEFECT = "In a world where everyone is defecting the biggest defecter wins"
 RES_TIT_FOR_TAT = "In a world where everyone is copying his predecessor the world turns to be more cooperative "
 RES_ALL_COOPERATE = "In a world where everyone is cooperating the world turns into defecting"
-RES_GRIMM ="In a world where everyone is a grimm the world turns into defecting with small pobability of cooperating "
+RES_GRIMM ="In a world where everyone is a grimm the world turns into defecting with a small pobability of cooperating "
 RES_EXTREM_MIXED_UP = "In a world where the strategies are extremly mixed up everything turns into a Tft but there is the probability of a coexistenz of AC & TFT & ADF "
-RES_RANDOM = "In a world with semi randomness the population turn into a strong defecting with more pobability on a cooperating population."
+RES_RANDOM = "In a world with randomness the population turn into a strong defecting with more pobability on a cooperating population."
 RES_MIXED_UP ="In a mixed world the population will turn into a Tit for Tat with stronger forgivness rate or into a defecting world"
 
 RES_TFT_VS_ADF ="Tft dominates All defect"
